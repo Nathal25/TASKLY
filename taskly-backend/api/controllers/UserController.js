@@ -57,7 +57,7 @@ class UserController extends GlobalController {
     return null;
   }
 
-  // Hash the password before saving using bycrypt
+  // Hash the password before saving using bcrypt
   async hashPassword(req) {
     const newPassword = await bcrypt.hash(req.body.password, 10);
     req.body.password = newPassword;
