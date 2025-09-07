@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 // Define the user schema with validation rules
 const UserSchema = new mongoose.Schema(
     {
-        firstName : {type: String, required: true},
+        firstName: {type: String, required: true},
         lastName: {type: String, required: true},
         age: {type: Number, min: 13, required: true},
         email: {type: String, required: true, unique: true},
