@@ -7,22 +7,38 @@ class UserController extends GlobalController {
     super(UserDAO);
   }
 
+  // Override the create method to add custom logic for user creation
   async create(req, res) {
     try {
-      // Additional validation for password confirmation
-      if (req.body.password != req.body.confirmPassword){
-        return res.status(400).json({ message: "Password and confirm password don't match" });
+      // Validate password and confirmPassword match
+      const passwordError = this.passwordValidation(req);
+      if(passwordError){
+        return res.status(400).json({message: passwordError});
       }
-
-      // Remove confirmPassword before saving
-      delete req.body.confirmPassword;
+      
+      // Check if the email already exists
+      const existingUser = await UserDAO.readByEmail(req.body.email);
+      if (existingUser) {
+        return res.status(409).json({message: "Email already in use"});
+      }
 
       // Call the parent create method of GlobalController
       return await super.create(req, res);
-      
+
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({message: error.message});
     }
+  }
+
+  // Additional validation for password confirmation
+  passwordValidation(req) {
+    if (req.body.password != req.body.confirmPassword) {
+      return "Password and confirm password don't match";
+    }
+
+    // Remove confirmPassword before saving
+    delete req.body.confirmPassword;
+    return null;
   }
 }
 

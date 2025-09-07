@@ -6,6 +6,17 @@ class UserDAO extends GlobalDAO {
     constructor() {
         super(User);
     }
+
+    // Create a method to find a user by email
+    async readByEmail(emailToSearch) {
+        try {
+            const document = await User.findOne({email: emailToSearch});
+            if (!document) throw new Error("Document not found");
+            return document;
+        } catch (error) {
+            throw new Error(`Error getting document by Email: ${error.message}`);
+        }
+    }
 }
 
 // Export an instance of the UserDAO
