@@ -30,6 +30,7 @@ router.get("/:id", (req, res) => UserController.read(req, res));
  * @access Public
  */
 router.post("/", (req, res) => UserController.create(req, res));
+router.post("/login", (req, res) => UserController.login(req, res));
 
 /**
  * @route PUT /users/:id
