@@ -64,21 +64,42 @@ class UserController extends GlobalController {
     return;
   }
 
+  // Login method to authenticate user and return a JWT token
   async login(req, res) {
     try {
+      // Check if the email exists and take the user
       const user = await UserDAO.readByEmail(req.body.email);
       if(!user) {
         return res.status(401).json({ message: "Invalid email" });
       }
 
+      // Compare the provided password with the stored hashed password
       const passwordMatch = await bcrypt.compare(req.body.password, user.password);
       if(!passwordMatch) {
         return res.status(401).json({ message: "Invalid password" });
       }
 
-      res.status(200).json({ message: "Login successful", Id: user._id });
+      // Generate a JWT token, with the structure: sing(payload (User data), secret (to sign), options)
+      const token = jwt.sign(
+        {
+          userID: user._id,
+          email: user.email
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '2h'}
+      );
 
-      return 0;
+      // Send the token in a HTTP-only cookie
+      res.cookie('token', token,
+        {
+          httpOnly: true, // JavaScript cannot access this cookie for the side of the client
+          secure: process.env.NODE_ENV === 'production', // Only be sent via HTTPS
+          sameSite: 'strict', // To prevent CSRF attacks (Cookie sent only for same-site requests (most secure))
+        }
+      );
+
+      // Successful login
+      res.status(200).json({ message: "Login successful"});
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
