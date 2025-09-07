@@ -13,27 +13,28 @@ class UserController extends GlobalController {
     try {
       // Validate password and confirmPassword match
       const passwordError = this.passwordValidation(req);
-      if(passwordError){
-        return res.status(400).json({message: passwordError});
+      if (passwordError) {
+        return res.status(400).json({ message: passwordError });
       }
-      
+
       // Check if the email already exists
       const existingUser = await UserDAO.readByEmail(req.body.email);
       if (existingUser) {
-        return res.status(409).json({message: "Email already in use"});
+        return res.status(409).json({ message: "Email already in use" });
       }
 
       await this.hashPassword(req);
 
-      // Call the parent create method of GlobalController
-      return await super.create(req, res);
+      // Call the create method directly from UserDAO (Ignore GlobalController for custom response)
+      const item = await UserDAO.create(req.body);
+      return res.status(201).json({ id: item._id });
 
     } catch (error) {
-      res.status(500).json({message: error.message});
+      res.status(500).json({ message: error.message });
     }
   }
 
-  // Additional validation for password confirmation
+  // Additional validation for password
   passwordValidation(req) {
     if (req.body.password != req.body.confirmPassword) {
       return "Password and confirm password don't match";
@@ -41,6 +42,12 @@ class UserController extends GlobalController {
 
     // Remove confirmPassword before saving
     delete req.body.confirmPassword;
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,}$/
+    if (!passwordRegex.test(req.body.password)) {
+      return "Password invalid"
+    }
+
     return null;
   }
 
@@ -48,7 +55,7 @@ class UserController extends GlobalController {
   async hashPassword(req) {
     const newPassword = await bcrypt.hash(req.body.password, 10);
     req.body.password = newPassword;
-    return newPassword;
+    return;
   }
 }
 

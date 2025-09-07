@@ -7,8 +7,7 @@ class GlobalController {
         console.log("Creating item with data:", req.body);
         try {
             const item = await this.dao.create(req.body);
-            res.status(201).json({id: item._id});
-            return item;
+            res.status(201).json(item);
         } catch (error) {
             res.status(400).json({ message: error.message });
         }
