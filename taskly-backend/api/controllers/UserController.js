@@ -30,7 +30,11 @@ class UserController extends GlobalController {
       return res.status(201).json({ id: item._id });
 
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      // Show detailed error only in development
+      if (process.env.NODE_ENV === "development") {
+        console.error(error); 
+      }
+      res.status(500).json({ message: "Internal Server Error"});
     }
   }
 
