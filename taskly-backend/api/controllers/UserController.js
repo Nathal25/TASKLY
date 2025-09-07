@@ -1,5 +1,6 @@
 const GlobalController = require("./GlobalController");
 const UserDAO = require("../dao/UserDAO");
+const bcrypt = require("bcrypt");
 
 // Create a UserController class that extends the GlobalController sending the UserDAO to the parent constructor
 class UserController extends GlobalController {
@@ -22,6 +23,8 @@ class UserController extends GlobalController {
         return res.status(409).json({message: "Email already in use"});
       }
 
+      await this.hashPassword(req);
+
       // Call the parent create method of GlobalController
       return await super.create(req, res);
 
@@ -39,6 +42,13 @@ class UserController extends GlobalController {
     // Remove confirmPassword before saving
     delete req.body.confirmPassword;
     return null;
+  }
+
+  // Hash the password before saving using bycrypt
+  async hashPassword(req) {
+    const newPassword = await bcrypt.hash(req.body.password, 10);
+    req.body.password = newPassword;
+    return newPassword;
   }
 }
 
