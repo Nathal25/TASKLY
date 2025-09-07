@@ -11,6 +11,7 @@ class GlobalDao {
             throw new Error(`Error creating document: ${error.message}`);
         }
     }
+
     async read(id) {
         try {
             const document = await this.model.findById(id);
@@ -20,6 +21,7 @@ class GlobalDao {
             throw new Error(`Error getting document by ID: ${error.message}`);
         }
     }
+
     async update(id, updateData) {
         try {
             const updatedDocument = await this.model.findByIdAndUpdate(
@@ -33,6 +35,7 @@ class GlobalDao {
             throw new Error(`Error updating document by ID: ${error.message}`);
         }
     }
+
     async delete(id) {
         try {
             const deletedDocument = await this.model.findByIdAndDelete(id);
@@ -42,6 +45,7 @@ class GlobalDao {
             throw new Error(`Error deleting document by ID: ${error.message}`);
         }
     }
+
     async getAll(filter = {}) {
         try {
             return await this.model.find(filter);
@@ -50,6 +54,5 @@ class GlobalDao {
         }
     }
 }
-
 
 module.exports = GlobalDao;
