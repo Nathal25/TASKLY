@@ -2,6 +2,7 @@ class GlobalController {
     constructor(dao) {
         this.dao = dao;
     }
+
     async create(req, res) {
         console.log("Creating item with data:", req.body);
         try {
@@ -12,7 +13,7 @@ class GlobalController {
         }
     }
 
-async read(req, res) {
+    async read(req, res) {
         try {
             const item = await this.dao.read(req.params.id);
             res.status(200).json(item);
@@ -20,7 +21,8 @@ async read(req, res) {
             res.status(404).json({ message: error.message });
         }
     }
-async update(req, res) {
+
+    async update(req, res) {
         try {
             const item = await this.dao.update(req.params.id, req.body);
             res.status(200).json(item);
@@ -29,7 +31,7 @@ async update(req, res) {
         }
     }
 
-async delete(req, res) {
+    async delete(req, res) {
         try {
             const item = await this.dao.delete(req.params.id);
             res.status(200).json(item);
@@ -37,7 +39,8 @@ async delete(req, res) {
             res.status(404).json({ message: error.message });
         }
     }
-async getAll(req, res) {
+
+    async getAll(req, res) {
         try {
             const items = await this.dao.getAll(req.query);
             res.status(200).json(items);
