@@ -100,7 +100,11 @@ class UserController extends GlobalController {
       // Successful login
       res.status(200).json({ message: "Login successful", id: user._id , email: user.email});
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      // Show detailed error only in development
+      if (process.env.NODE_ENV === "development") {
+        console.error(error);
+      }
+      res.status(500).json({ message: "Internal Server Error" });
     }
   }
 
