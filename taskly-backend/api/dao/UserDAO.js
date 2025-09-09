@@ -1,5 +1,5 @@
-const User = require('../models/User');
-const GlobalDAO = require('./GlobalDao');
+const User = require("../models/User");
+const GlobalDAO = require("./GlobalDao");
 
 // Create a UserDAO class that extends the GlobalDAO sending the User model to the parent constructor
 class UserDAO extends GlobalDAO {
