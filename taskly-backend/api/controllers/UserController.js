@@ -70,20 +70,19 @@ class UserController extends GlobalController {
       // Check if the email exists and take the user
       const user = await UserDAO.readByEmail(req.body.email);
       if(!user) {
-        return res.status(401).json({ message: "Invalid email" });
+        return res.status(401).json({ message: "Invalid email or password" });
       }
 
       // Compare the provided password with the stored hashed password
       const passwordMatch = await bcrypt.compare(req.body.password, user.password);
       if(!passwordMatch) {
-        return res.status(401).json({ message: "Invalid password" });
+        return res.status(401).json({ message: "Invalid email or password" });
       }
 
-      // Generate a JWT token, with the structure: sing(payload (User data), secret (to sign), options)
+      // Generate a JWT token, with the structure: sing(payload (data), secret (to sign), options)
       const token = jwt.sign(
         {
-          userID: user._id,
-          email: user.email
+          userId: user._id
         },
         process.env.JWT_SECRET,
         { expiresIn: '2h'}
@@ -99,10 +98,21 @@ class UserController extends GlobalController {
       );
 
       // Successful login
-      res.status(200).json({ message: "Login successful"});
+      res.status(200).json({ message: "Login successful", id: user._id , email: user.email});
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
+  }
+
+  // Logout method to clear the JWT token cookie
+  logout(req, res) {
+    // Clear the token cookie with the same options used to create it
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',      
+      sameSite: 'strict'
+    });
+    res.status(200).json({ message: "Logged out successfully" });
   }
 }
 
